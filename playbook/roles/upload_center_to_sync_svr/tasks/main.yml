@@ -1,0 +1,5 @@
+- name: copy distribution to remote package path
+  copy: 
+    src: "{{sync_cs_src_path}}"
+    dest: "{{sync_loacl_path}}/{{sync_cs_dir_name}}"
+    mode: "0755"

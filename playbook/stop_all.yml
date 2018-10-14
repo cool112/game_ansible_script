@@ -1,0 +1,5 @@
+---
+- include: stop_center.yml
+- include: stop_game.yml
+- include: stop_war.yml
+

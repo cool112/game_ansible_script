@@ -1,0 +1,8 @@
+---
+- name: cron mysql backup
+  hosts: game_server
+  
+  roles:
+    - 
+      role: cron_mysql_backup
+      server_config: "{{gs_config}}"

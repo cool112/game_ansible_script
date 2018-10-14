@@ -1,0 +1,37 @@
+- name: create install dir if not exsits
+  shell: mkdir -p {{sync_local_path}}
+  args:
+    creates: "{{sync_local_path}}"
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.bs_port,item.gs_port]}} | issubset(allow_ports)"
+
+- name: sync distribution to remote package path
+  shell: rsync -avh --stats --progress rsync://{{sync_source}} {{sync_local_path}}
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+
+- name: find lastest(5 min) .tar.gz or .tgz file in package dir
+  shell: ls -t |grep -E '.*\.t?gz$'|head -n1
+  args: 
+    chdir: "{{sync_local_path}}/{{sync_dir_name}}"
+  with_items: "{{server_config | default([])}}"
+  ignore_errors: True
+  register: findResult
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: uncompress lastest .tar.gz file to install dir
+  shell: tar -zxf {{item.1.stdout}} -C {{item.0.path}}
+  args: 
+    chdir: "{{sync_local_path}}/{{sync_dir_name}}"
+  with_together: 
+    - "{{server_config | default([])}}"
+    - "{{findResult.results | default([])}}"
+  when: 
+    - (item.1|changed and item.1.stdout != "")
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

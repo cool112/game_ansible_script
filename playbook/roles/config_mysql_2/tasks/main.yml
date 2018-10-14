@@ -1,0 +1,19 @@
+- name: add need database
+  mysql_db:
+    name: "{{item.name}}"
+    state: present
+    encoding: "{{item.encoding}}"
+    login_user: root
+    login_password: "{{root_init_password}}"
+  with_items: "{{create_database | default([])}}"
+  
+- name: add need user
+  mysql_user: 
+    name: "{{item.name}}"
+    password: "{{item.password}}"
+    host: "{{item.host}}"
+    priv: "{{item.priv}}"
+    state: present
+    login_user: root
+    login_password: "{{root_init_password}}"
+  with_items: "{{create_user | default([])}}"

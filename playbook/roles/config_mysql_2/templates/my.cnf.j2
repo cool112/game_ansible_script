@@ -1,0 +1,9 @@
+[mysqld]
+datadir={{mysql_data_dir}}
+socket={{mysql_data_dir}}/mysql.sock
+user=mysql
+log-error={{mysql_log_dir}}/mysql-error.log
+innodb_log_file_size=64M
+max_connections=5000
+pid-file={{mysql_pid_dir}}/mysql.pid
+

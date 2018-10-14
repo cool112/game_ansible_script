@@ -1,0 +1,10 @@
+- name: get mysql-devel from ftp
+  shell: wget -np -nH {{mysql_ftp_url}}/{{mysql_devel_version}}
+  args:
+   chdir: "{{mysql_package_dir}}"
+   creates: "{{mysql_package_dir}}/{{mysql_devel_version}}"
+    
+- name: install mysql-devel
+  shell: rpm -i {{mysql_devel_version}}
+  args:
+   chdir: "{{mysql_package_dir}}"

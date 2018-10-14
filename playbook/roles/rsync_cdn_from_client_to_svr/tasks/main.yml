@@ -1,0 +1,18 @@
+- name: sync Android defalut pwd in $RSYNC_PASSWORD
+  shell: rsync -av {{sync_src_dir}}/Android/ {{sync_remote_android_dir}}
+  register: syncInfo
+  become_user: root
+  
+- name: sync android info 
+  debug: 
+    msg: "{{syncInfo}}"
+    
+- name: sync IOS
+  shell: rsync -av {{sync_src_dir}}/IOS/ {{sync_remote_ios_dir}}
+  register: syncInfo
+  become_user: root
+  
+- name: sync IOS info 
+  debug: 
+    msg: "{{syncInfo}}"
+  

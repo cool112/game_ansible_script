@@ -1,0 +1,33 @@
+- name: copy distribution to remote package path
+  copy: 
+    src: "{{item.src}}"
+    dest: "{{item.package_path}}"
+    mode: "0755"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+
+- name: find lastest(5 min) .tar.gz or .tgz file in package dir
+  shell: ls -t |grep -E '.*\.t?gz$'|head -n1
+  args: 
+    chdir: "{{item.package_path}}"
+  with_items: "{{server_config | default([])}}"
+  ignore_errors: True
+  register: findResult
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: uncompress lastest .tar.gz file to install dir
+  shell: tar -zxf {{item.1.stdout}} -C {{item.0.path}}
+  args: 
+    chdir: "{{item.0.package_path}}"
+  with_together: 
+    - "{{server_config | default([])}}"
+    - "{{findResult.results | default([])}}"
+  when: 
+    - (item.1|changed and item.1.stdout != "")
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

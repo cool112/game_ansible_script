@@ -1,0 +1,7 @@
+---
+- name: cron mysql backup in test server
+  hosts: test_server
+  
+  roles:
+    - 
+      role: cron_dump_all_game_db

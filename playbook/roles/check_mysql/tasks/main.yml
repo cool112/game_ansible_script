@@ -1,0 +1,25 @@
+- name: install MySQL-python for check Mysql db status
+  yum: 
+    name: MySQL-python
+  ignore_errors: True
+  become: true
+    
+- name: check mysql default character set
+  mysql_variables: 
+    variable: character_set_database
+    login_host: "{{item.db_host}}"
+    login_port: "{{item.db_port | default(3306)}}"
+    login_user: "{{item.db_user}}"
+    login_password: "{{item.db_pwd}}"
+  with_items: "{{server_config | default([])}}"
+  register: charResult
+  ignore_errors: True
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+- name: if char is not utf-8 or mysql is unreached then warning
+  debug: 
+    msg: "WARN: mysql://{{item.item.db_host}}:3306 character_set_database is {{item.msg}}"
+  when: item|changed and (item.msg != "utf8" or item.msg != "UTF8")
+  with_items: "{{charResult.results | default([])}}"

@@ -1,0 +1,9 @@
+---
+- name: game server stop
+  hosts: game_server
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: check_port_use_and_kill
+    server_config: "{{gs_config}}"

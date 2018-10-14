@@ -1,0 +1,8 @@
+- name: iptables open center server mon_port
+  iptables: 
+    chain: INPUT
+    destination_port: "{{item.mon_port}}"
+    jump: ACCEPT
+    protocol: tcp
+  with_items: "{{center_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.bs_port,item.gs_port]}} | issubset(allow_ports)"

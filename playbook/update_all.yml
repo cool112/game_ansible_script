@@ -1,0 +1,5 @@
+---
+- include: update_center.yml
+- include: update_game.yml
+- include: update_war.yml
+

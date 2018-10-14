@@ -1,0 +1,17 @@
+- name: clean old data config
+  shell: rm -rf {{item.path}}/{{item.static_data_dir}}/*
+  when: 
+    - item.static_data_dir is defined
+    - item.static_data_dir != ""
+    - allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  with_items: "{{server_config | default([])}}"
+  
+- name: unarchive data_config.tgz to static data dir
+  unarchive: 
+    src: "{{item.src}}/data_config.tgz"
+    dest: "{{item.path}}/{{item.static_data_dir}}/"
+  when: 
+    - allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  with_items: "{{server_config | default([])}}"

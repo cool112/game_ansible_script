@@ -1,0 +1,9 @@
+- name: sync IOS
+  shell: rsync -av {{sync_src_dir}}/IOS/ {{sync_remote_ios_dir}}
+  register: syncInfo
+  become_user: root
+  
+- name: sync IOS info 
+  debug: 
+    msg: "{{syncInfo}}"
+  

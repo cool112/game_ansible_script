@@ -1,0 +1,10 @@
+- name: get mysql-client from ftp
+  shell: wget -np -nH {{mysql_ftp_url}}/{{mysql_client_version}}
+  args:
+    chdir: "{{mysql_package_dir}}"
+    creates: "{{mysql_package_dir}}/{{mysql_client_version}}"
+    
+- name: install mysql-client
+  shell: rpm -i {{mysql_client_version}}
+  args:
+    chdir: "{{mysql_package_dir}}"

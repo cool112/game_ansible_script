@@ -1,0 +1,11 @@
+---
+- name: install php
+  hosts: php
+  
+  roles:
+    - 
+      role: prepare_php_env
+    - 
+      role: install_php
+    - 
+      role: config_php

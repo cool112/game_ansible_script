@@ -1,0 +1,96 @@
+- name: get php from offical
+  get_url:
+    url: "{{php_get_url}}"
+    dest: "{{php_package_dir}}/{{php_version}}.tar.xz"
+    mode: 0755
+  become: true
+    
+- name: clean exsits dir
+  shell: rm -rf {{php_package_dir}}/{{php_version}}
+  become: true
+
+- name: uncompress
+  shell: tar xJf {{php_version}}.tar.xz -C .
+  args:
+    chdir: "{{php_package_dir}}"
+  become: true
+
+- name: add group
+  group:
+    name: www
+  become: true
+
+- name: add user
+  user:
+    name: www
+    group: www
+    shell: /sbin/nologin
+    createhome: no
+  become: true
+    
+- name: clean
+  shell: make clean
+  args:
+    chdir: "{{php_package_dir}}/{{php_version}}"
+  ignore_errors: True
+  become: true
+
+- name: clean all
+  shell: make clean all
+  args:
+    chdir: "{{php_package_dir}}/{{php_version}}"
+  ignore_errors: True
+  become: true
+
+- name: configure install
+  shell: >
+    ./configure \
+    --prefix={{php_install_dir}} \
+    --with-config-file-path={{php_install_dir}}/etc \
+    --enable-inline-optimization \
+    --disable-debug \
+    --disable-rpath \
+    --enable-shared \
+    --enable-opcache \
+    --enable-fpm \
+    --with-fpm-user=www \
+    --with-fpm-group=www \
+    --with-mysql=mysqlnd \
+    --with-mysqli=mysqlnd \
+    --with-pdo-mysql=mysqlnd \
+    --with-gettext \
+    --enable-mbstring \
+    --with-iconv \
+    --with-mcrypt \
+    --with-mhash \
+    --with-openssl \
+    --enable-bcmath \
+    --enable-soap \
+    --with-libxml-dir \
+    --enable-pcntl \
+    --enable-shmop \
+    --enable-sysvmsg \
+    --enable-sysvsem \
+    --enable-sysvshm \
+    --enable-sockets \
+    --with-curl \
+    --with-zlib \
+    --enable-zip \
+    --with-bz2 \
+    --with-gd \
+    --with-readline 
+  args:
+    chdir: "{{php_package_dir}}/{{php_version}}"
+  become: true
+    
+- name: make
+  shell: make -j8
+  args:
+    chdir: "{{php_package_dir}}/{{php_version}}"
+  become: true
+
+- name: install
+  shell: make install
+  args:
+    chdir: "{{php_package_dir}}/{{php_version}}"
+  become: true

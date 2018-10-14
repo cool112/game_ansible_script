@@ -1,0 +1,9 @@
+- name: check if port has beean used
+  wait_for:
+    port: "{{item.port}}"
+    timeout: 30
+    state: stopped
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

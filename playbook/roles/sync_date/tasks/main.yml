@@ -1,0 +1,26 @@
+# - name: set time zone
+  # timezone:
+    # name: "{{time_zone}}"
+
+- name: yum ntpdate
+  yum:
+    name: ntpdate
+    
+# - name: set time zone 2
+  # blockinfile:
+    # dest: /etc/profile
+    # block: |
+      # TZ='Asia/Bangkok'; export TZ
+    # marker: "# {mark} tz set"
+
+# - name: source /etc/profile
+  # shell: source /etc/profile
+    
+- name: ntpdate
+  shell: ntpdate {{ntp_host}}
+
+- name: cron sync per hour
+  cron:
+    name: "ntp per hour"
+    minute: 0
+    job: "/usr/sbin/ntpdate ntp.api.bz"

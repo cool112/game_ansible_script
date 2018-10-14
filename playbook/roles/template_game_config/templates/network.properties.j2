@@ -1,0 +1,47 @@
+
+# bind game server ID, prot
+game.network.gc.id = {{item.gc_id}}
+game.network.gc.port = {{item.port}}
+#clean server id
+gc.game.server.cleanId = {{item.clean_id}}
+
+# connect center server IP, port
+game.network.bcs.ip = {{item.bcs_ip}}
+game.network.bcs.port = {{item.bcs_port}}
+
+#http ip
+game.network.gm.ip = {{item.gm_ip}}
+# bind http port
+game.network.gm.port = {{item.gm_port}}
+
+# game
+game.network.gc.name = {{item.gc_name}}
+
+# debug  gm sdk
+game.debug = {{item.debug}}
+game.gm = {{item.gm}}
+game.sdk.code = {{item.sdk_code}}
+
+# server open time
+gc.game.server.openTime = {{item.open_time}}
+
+# sdk report url
+gc.game.server.sdk.url = {{item.sdk_url}}
+
+# sdk ids
+game.network.gc.sdk_ids = {{item.sdk_ids}}
+
+# dbcenter url
+gc.game.server.dbcenter.url = {{item.dbcenter_url}}
+
+# name forbid space
+gc.game.server.name.nospace = {{item.name_nospace | default(false)}}
+
+#name use korea rule
+gc.game.server.name.korea = {{item.name_korea | default(false)}}
+
+#platform which decides preference
+gc.game.pf = {{item.platform | default("zq")}}
+
+#review version
+game.shenhe = {{item.review | default(false)}}

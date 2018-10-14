@@ -1,0 +1,13 @@
+- name: template network config file
+  template: 
+    src: network.properties.j2
+    dest: "{{item.path}}/config/network.properties"
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+
+- name: template start.sh file
+  template: 
+    src: start.sh.j2
+    dest: "{{item.path}}/start.sh"
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"

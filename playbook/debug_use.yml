@@ -1,0 +1,8 @@
+---
+- name: show debug information
+  hosts: game_server
+ 
+  roles:
+    - 
+      role: template_game_config
+      server_config: "{{gs_config}}"

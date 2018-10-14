@@ -1,0 +1,46 @@
+- name: update yum
+  yum:
+    name: yum
+    state: latest
+  become: true
+    
+- name: install epel
+  yum:
+    name: epel-release-6-8.noarch
+  ignore_errors: True
+  become: true
+
+- name: dependencies install
+  yum:
+    name: >
+      gcc,bison,bison-devel,
+      zlib-devel,libmcrypt-devel,mcrypt,mhash-devel,
+      openssl-devel,libxml2-devel,libcurl-devel,bzip2-devel,
+      readline-devel,libedit-devel,sqlite-devel,re2c,libpng-devel
+  become: true
+  ignore_errors: True
+      
+- name: query exsits package or libs(centos 6)
+  shell: rpm -qa|grep '^php.*-5.3.*'
+  register: phpPk
+  ignore_errors: True
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  become: true
+  
+- name: remove php-5.3 libs 
+  shell: rpm -e --nodeps {{item}}
+  with_items: "{{phpPk.stdout_lines | default([])}}"
+  when:
+    - item != ""
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  become: true
+      
+- name: init download dir
+  file:
+    path: "{{php_package_dir}}"
+    state: directory
+    mode: 0755
+  become: true

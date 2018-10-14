@@ -1,0 +1,19 @@
+---
+- name: war server update without start
+  hosts: war_server
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: check_port_use_and_kill
+    server_config: "{{bs_config}}"
+  - 
+    role: init_directory
+    server_config: "{{bs_config}}"
+  - 
+    role: copy_and_extract
+    server_config: "{{bs_config}}"
+  - 
+    role: template_war_config
+    server_config: "{{bs_config}}"
+

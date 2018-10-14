@@ -1,0 +1,17 @@
+- name: update yum
+  yum:
+    name: yum
+    state: latest
+  become: true
+    
+- name: install epel
+  yum:
+    name: epel-release-6-8.noarch
+  ignore_errors: True
+  become: true
+   
+# - name: init download dir
+  # file:
+    # path: "{{nginx_package_dir}}"
+    # state: directory
+    # mode: 0755

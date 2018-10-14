@@ -1,0 +1,5 @@
+---
+- include: start_center.yml
+- include: start_game.yml
+- include: start_war.yml
+

@@ -1,0 +1,15 @@
+- name: check if cgs port has been used
+  wait_for:
+    port: "{{item.gs_port}}"
+    timeout: 1
+    state: stopped
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.gs_port,item.bs_port]}} | issubset(allow_ports)"
+  
+- name: check if cbs port has been used
+  wait_for:
+    port: "{{item.bs_port}}"
+    timeout: 1
+    state: stopped
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.gs_port,item.bs_port]}} | issubset(allow_ports)"

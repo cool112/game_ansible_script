@@ -1,0 +1,8 @@
+---
+- name: initialize db
+  hosts: game_server
+  
+  roles:
+    - 
+      role: init_db
+      server_config: "{{gs_config}}"

@@ -1,0 +1,9 @@
+- name: dump mysql all data to backup dir
+  shell: >
+    mysqldump -u{{item.db_user}} -h{{item.db_host}} -p{{item.db_pwd}} 
+    -P{{item.db_port | default(3306)}} {{item.db_name_pre}}
+    --no-create-info > {{item.db_backup_dir}}/{{item.db_name_pre}}_$(date +%y%m%d).sql
+  with_items: "{{gs_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

@@ -1,0 +1,11 @@
+- name: get mysql-server from ftp
+  shell: wget -np -nH {{mysql_ftp_url}}/{{mysql_server_version}}
+  args:
+    chdir: "{{mysql_package_dir}}"
+    creates: "{{mysql_package_dir}}/{{mysql_server_version}}"
+    
+- name: install mysql-server 
+  shell: rpm -i {{mysql_server_version}}
+  args:
+    chdir: "{{mysql_package_dir}}"
+    

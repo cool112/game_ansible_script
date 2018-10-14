@@ -1,0 +1,51 @@
+- name: template backupMysql.sh file
+  template: 
+    src: backupMysql.sh.j2
+    dest: "{{item.path}}/backupMysql.sh"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+- name: mode 755 backupMysql.sh file
+  file:
+    path: "{{item.path}}/backupMysql.sh"
+    state: file
+    mode: 0755
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: backup current db
+  shell: ./backupMysql.sh {{item.db_user}} {{item.db_host}} {{item.db_pwd}} {{item.db_name_pre}} {{item.db_backup_dir}}
+  args:
+    chdir: "{{item.path}}"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+- name: template update_game.sql
+  template: 
+    src: update_game.sql.j2
+    dest: "{{item.path}}/data/sql/update_game.sql"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+- name: import update sql
+  mysql_db:
+    name: "{{item.db_name_pre}}"
+    state: import
+    target: "{{item.path}}/data/sql/update_game.sql"
+    login_user: "{{item.db_user}}"
+    login_password: "{{item.db_pwd}}"
+    login_port: "{{item.db_port | default(3306)}}"
+    login_host: "{{item.db_host}}"
+    config_file: /etc/my.cnf
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

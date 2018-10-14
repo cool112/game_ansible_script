@@ -1,0 +1,60 @@
+# - name: change network.properties encoding
+  # shell: vi +"set bomb | set fileencoding=iso-8859-1 | wq" {{item.path}}/config/network.properties
+  # with_items: "{{server_config | default([])}}"
+  # when: 
+    # - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    # - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: template network config file
+  template: 
+    src: network.properties.j2
+    dest: "{{item.path}}/config/network.properties"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: template db config file
+  template: 
+    src: database.properties.j2
+    dest: "{{item.path}}/config/database.properties"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: template syncchat config file
+  template: 
+    src: syncchat.properties.j2
+    dest: "{{item.path}}/config/syncchat.properties"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: template xinma config file
+  template: 
+    src: xinma.properties.j2
+    dest: "{{item.path}}/config/xinma.properties"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: template bak_sql.sh file
+  template: 
+    src: bak_sql.sh.j2
+    dest: "{{item.path}}/bak_sql.sh"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: template start.sh file
+  template: 
+    src: start.sh.j2
+    dest: "{{item.path}}/start.sh"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

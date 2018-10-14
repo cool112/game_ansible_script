@@ -1,0 +1,9 @@
+---
+- name: update war data config
+  hosts: 
+    - war_server
+  
+  roles:
+    - 
+      role: update_static_data
+      server_config: "{{bs_config | default([])}}"

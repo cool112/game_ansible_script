@@ -1,0 +1,28 @@
+---
+#- include: sync_date.yml
+
+- name: center server start
+  hosts: center_server
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: check_center_port_stop
+    server_config: "{{center_config}}"
+  - 
+    role: init_center_directory
+    server_config: "{{center_config}}"
+  - 
+    role: copy_and_extract_center
+    server_config: "{{center_config}}"
+  - 
+    role: template_center_config
+    server_config: "{{center_config}}"
+  - 
+    role: start_center_server
+    server_config: "{{center_config}}"
+  - 
+    role: wait_center_port
+    server_config: "{{center_config}}"
+    
+- include: open_center_mon_port.yml

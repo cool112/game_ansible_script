@@ -1,0 +1,4 @@
+---
+- include: update_game_data_config_hot_mount.yml
+
+- include: update_war_data_config_hot_mount.yml

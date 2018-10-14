@@ -1,0 +1,6 @@
+---
+- name: open gm port and gs port
+  hosts: game_server
+  
+  roles:
+    - role: accept_hosts_to_gm_port

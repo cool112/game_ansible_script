@@ -1,0 +1,20 @@
+- name: show all game hosts in game_server
+  debug:
+    msg: "{{hostvars[item].gs_config}}"
+  with_items: "{{groups['game_server']}}"
+  register: game_info
+
+- name: show id
+  debug: 
+    msg: "game_info: {{game_info}}"
+    
+- name: show id
+  debug: 
+    msg: "gc_id: {{item[1].gc_id}}"
+  with_subelements:
+    - "{{game_info.results}}"
+    - msg
+    
+# - name: show host info
+  # debug: 
+    # msg: "{{inventory_hostname}}"

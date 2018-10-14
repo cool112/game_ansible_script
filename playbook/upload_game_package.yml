@@ -1,0 +1,8 @@
+---
+- name: upload game package
+  hosts: all
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: upload_game_to_sync_svr

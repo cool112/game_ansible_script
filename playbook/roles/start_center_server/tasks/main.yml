@@ -1,0 +1,22 @@
+- name: mode 755 start.sh file
+  file:
+    path: "{{item.path}}/start.sh"
+    state: file
+    mode: 0755
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.bs_port,item.gs_port]}} | issubset(allow_ports)"
+
+- name: mode 755 stop.sh file
+  file:
+    path: "{{item.path}}/stop.sh"
+    state: file
+    mode: 0755
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.bs_port,item.gs_port]}} | issubset(allow_ports)"
+    
+- name: start server
+  shell: sh start.sh
+  args:
+    chdir: "{{item.path}}"
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.bs_port,item.gs_port]}} | issubset(allow_ports)"

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd /usr/bin
+
+#add new dump statement#
+
+find {{backup_dir}} -name '*.dump.gz' -mtime +7 -type f |xargs rm -rf

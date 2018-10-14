@@ -1,0 +1,15 @@
+---
+- name: game server restart
+  hosts: game_server
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: check_port_use_and_kill
+    server_config: "{{gs_config}}"
+  - 
+    role: start_server
+    server_config: "{{gs_config}}"
+  - 
+    role: wait_port
+    server_config: "{{gs_config}}"

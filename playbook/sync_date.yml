@@ -1,0 +1,7 @@
+---
+- name: synchronize date to a specific time zone
+  hosts: sync_date
+  
+  roles:
+    - 
+      role: sync_date

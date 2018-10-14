@@ -1,0 +1,46 @@
+- name: dump player prefix tables data
+  shell:  >
+    mysqldump -u{{item.db_user}} -h{{item.db_host}} -p{{item.db_pwd}} 
+    -P{{item.db_port | default(3306)}} {{item.db_name_pre}}
+    {{player_pre_tables}} --no-create-info > {{item.db_backup_dir}}/{{item.db_name_pre}}_players_$(date +%y%m%d).sql
+  with_items: "{{gs_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "{{[item.gc_id]}} | issubset(slave_gc_id)"
+
+- name: get date var
+  shell: echo $(date +%y%m%d)
+  register: dateVar
+
+- name: import player data to target db
+  mysql_db:
+    name: "{{item[0].db_name_pre}}"
+    state: import
+    target: "{{item[1].db_backup_dir}}/{{item[1].db_name_pre}}_players_{{dateVar.stdout}}.sql"
+    login_user: "{{item[0].db_user}}"
+    login_password: "{{item[0].db_pwd}}"
+    login_host: "{{item[0].db_host}}"
+    login_port: "{{item[0].db_port | default(3306)}}"
+    config_file: /etc/my.cnf
+  with_nested:
+    - "{{hostvars[master_host].gs_config | default([])}}"
+    - "{{gs_config | default([])}}"
+  when: 
+    - allow_ports is undefined or {{[item[0].port, item[1].port]}} | issubset(allow_ports)
+    - "{{[item[0].gc_id]}} | issubset(master_gc_id)"
+    - "{{[item[1].gc_id]}} | issubset(slave_gc_id)"
+    
+- name: execute merge.sql
+  mysql_db:
+    name: "{{item.db_name_pre}}"
+    state: import
+    target: "{{item.path}}/data/sql/merge.sql"
+    login_user: "{{item.db_user}}"
+    login_password: "{{item.db_pwd}}"
+    login_host: "{{item.db_host}}"
+    login_port: "{{item.db_port | default(3306)}}"
+    config_file: /etc/my.cnf
+  with_items: "{{gs_config | default([])}}"
+  when: 
+    - allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)
+    - "{{[item.gc_id]}} | issubset(master_gc_id)"

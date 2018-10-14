@@ -1,0 +1,3 @@
+---
+- include: init_db.yml
+- include: start_all.yml

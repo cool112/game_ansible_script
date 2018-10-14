@@ -1,0 +1,25 @@
+- name: check if exsits proper jdk
+  shell: find /usr/java -name 'jdk1.8.0*' -type d|head -n1
+  register: possible_jdk
+
+- name: export JAVA_HOME CLASSPATH PATH
+  blockinfile:
+    dest: /etc/profile
+    block: |
+      export JAVA_HOME={{possible_jdk.stdout}}
+      export CLASSPATH=.:$JAVA_HOME/jre/lib/rt.jar:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+      export PATH=$PATH:$JAVA_HOME/bin
+    marker: "# {mark} jdk env"
+  become: true
+
+- name: source profile
+  shell: source /etc/profile
+  become: true
+
+- name: install java alternatives
+  shell: update-alternatives --install /usr/bin/java java {{possible_jdk.stdout}}/bin/java 18000
+  become: true
+  
+- name: correct java version selected
+  alternatives: name=java path={{possible_jdk.stdout}}/bin/java
+  become: true

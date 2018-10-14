@@ -1,0 +1,8 @@
+- name: wait for server port
+  wait_for:
+    port: "{{item.port}}"
+    timeout: 120
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

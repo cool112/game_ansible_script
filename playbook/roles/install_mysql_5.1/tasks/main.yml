@@ -1,0 +1,11 @@
+- name: install perl module
+  yum:
+    name: perl-Module-Install.noarch
+
+- name: install python module
+  yum:
+    name: MySQL-python,libselinux-python
+
+- name: install mysql client, server, and devel
+  yum:
+    name: mysql,mysql-server,mysql-devel

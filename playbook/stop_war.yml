@@ -1,0 +1,9 @@
+---
+- name: war server stop
+  hosts: war_server
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: check_port_use_and_kill
+    server_config: "{{bs_config}}"

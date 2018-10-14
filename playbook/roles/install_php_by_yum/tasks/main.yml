@@ -1,0 +1,8 @@
+- name: update yum
+  yum:
+    name: yum
+    state: lastest
+    
+- name: install php
+  yum:
+    name: php

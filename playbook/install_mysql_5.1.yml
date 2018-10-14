@@ -1,0 +1,7 @@
+---
+- name: install mysql 5.1
+  hosts: mysql
+  
+  roles:
+    - 
+      role: install_mysql_5.1

@@ -1,0 +1,7 @@
+---
+- name: sync cdn
+  hosts: local_svn_server
+ 
+  roles:
+    - 
+      role: rsync_cdn_from_client_to_svr

@@ -1,0 +1,15 @@
+#!/bin/bash
+##########################################################
+# Write date  : 2015/11/05
+# Written by  : darren.ouyang <ouyang.darren@gmail.com>
+# Written fea : Game control of shell script
+##########################################################
+. ~/.bash_profile
+
+db_user={{item.db_user}}
+db_password={{item.db_pwd}}
+db_name={{item.db_name_pre}}{{item.gc_id}}
+db_host={{item.db_host}}
+mysqldump -u$db_user -p$db_password -h$db_host $db_name > $db_name$(date +%y%m%d).sql
+
+

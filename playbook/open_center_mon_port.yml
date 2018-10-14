@@ -1,0 +1,6 @@
+---
+- name: open center mon port
+  hosts: center_server
+  
+  roles:
+    - role: open_center_mon_port

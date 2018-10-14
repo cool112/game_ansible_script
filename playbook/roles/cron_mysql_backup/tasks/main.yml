@@ -1,0 +1,39 @@
+- name: init backup dir
+  file:
+    path: "{{item.db_backup_dir}}"
+    state: directory
+    mode: 0755
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: template backupMysql.sh file
+  template: 
+    src: backupMysql.sh.j2
+    dest: "{{item.path}}/backupMysql.sh"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+- name: mode 755 backupMysql.sh file
+  file:
+    path: "{{item.path}}/backupMysql.sh"
+    state: file
+    mode: 0755
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+- name: cron daily backupMysql
+  cron:
+    name: "{{item.db_name_pre}}_backup"
+    minute: 0
+    hour: 4
+    job: "{{item.path}}/backupMysql.sh {{item.db_user}} {{item.db_host}} {{item.db_pwd}} {{item.db_name_pre}} {{item.db_backup_dir}}"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

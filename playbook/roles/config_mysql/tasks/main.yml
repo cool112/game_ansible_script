@@ -1,0 +1,110 @@
+- name: stop mysql
+  service:
+    name: mysql
+    state: stopped
+  become: true
+
+- name: template my.cnf
+  template: 
+    src: my.cnf.j2
+    dest: /etc/my.cnf
+  become: true
+    
+- name: init data dir
+  file:
+    path: "{{mysql_data_dir}}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: u=rwx,g=rw,o=rw
+  become: true
+
+- name: init pid dir
+  file:
+    path: "{{mysql_pid_dir}}"
+    state: directory
+    owner: mysql
+    group: mysql
+    mode: u=rwx,g=rw,o=rw
+  become: true
+    
+- name: init log file
+  file:
+    path: "{{mysql_log_dir}}/mysql-error.log"
+    state: touch
+    owner: mysql
+    group: mysql
+    mode: u=rwx,g=rw,o=rw
+  become: true
+
+- name: disable seliunx
+  selinux: 
+    state: disabled
+  become: true
+    
+- name: init db
+  shell: /usr/bin/mysql_install_db
+  args:
+    creates: "{{mysql_data_dir}}/mysql/user.frm"
+  become: true
+    
+- name: start service 
+  service:
+    name: mysql
+    state: started
+  become: true
+
+- name: init root user step 1(centos 7)
+  shell: /usr/bin/mysqladmin -u root password '{{root_init_password}}'
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7"
+  ignore_errors: True
+  become: true
+
+- name: get init password from file
+  shell: cat ~/.mysql_secret |awk 'NR==1{print $18}'
+  register: rand_password
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  become: true
+    
+- name: init root user step 1(centos 6)
+  shell: /usr/bin/mysqladmin -u root -p{{rand_password.stdout}} password '{{root_init_password}}'
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "6"
+  ignore_errors: True
+  become: true
+  
+- name: init root user step 2
+  shell: /usr/bin/mysqladmin -u root -p{{root_init_password}} -h localhost.localdomain password '{{root_init_password}}'
+  ignore_errors: True
+  become: true
+  
+#simple deal with iptables
+- name: stop iptables
+  service:
+    name: iptables
+    state: stopped
+  
+# - name: add need database
+  # mysql_db:
+    # name: "{{item.name}}"
+    # state: present
+    # encoding: "{{item.encoding}}"
+    # login_user: root
+    # login_password: "{{root_init_password}}"
+  # with_items: "{{create_database | default([])}}"
+  
+# - name: add need user
+  # mysql_user: 
+    # name: "{{item.name}}"
+    # password: "{{item.password}}"
+    # host: "{{item.host}}"
+    # priv: "{{item.priv}}"
+    # state: present
+    # login_user: root
+    # login_password: "{{root_init_password}}"
+  # with_items: "{{create_user | default([])}}"

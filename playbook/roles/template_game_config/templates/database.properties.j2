@@ -1,0 +1,18 @@
+# This class represents database driver class that will be used while connecting to database
+database.driver = com.mysql.jdbc.Driver
+
+# This is database url. 
+database.url = jdbc:mysql://{{item.db_host}}:{{item.db_port | default(3306)}}/{{item.db_name_pre}}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&failOverReadOnly=false&useSSL=false
+
+# Database user, password
+database.user = {{item.db_user}}
+database.password = {{item.db_pwd}}
+#database.password = oyzx2007
+
+# Minimum amount of database connections that will allways in the pool
+database.connections.min = 10
+
+# Maximum amount of DB connections that server can use
+database.connections.max = 200
+
+database.scriptcontext.descriptor = ./data/scripts/system/database.xml

@@ -1,0 +1,28 @@
+- name: iptables accept host access gm port
+  iptables: 
+    chain: INPUT
+    source: "{{item[1]}}"
+    destination_port: "{{item[0].gm_port}}"
+    jump: ACCEPT
+    protocol: tcp
+    action: insert    
+  with_nested:
+    - "{{gs_config | default([])}}"
+    - "{{gm_hosts}}"
+
+- name: iptables open game server port
+  iptables: 
+    chain: INPUT
+    destination_port: "{{item.port}}"
+    jump: ACCEPT
+    protocol: tcp
+#    action: insert
+  with_items: "{{gs_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  
+- name: restart iptables
+  service:
+    name: iptables
+    state: restarted

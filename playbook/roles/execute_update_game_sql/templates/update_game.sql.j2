@@ -1,0 +1,88 @@
+ALTER TABLE `log_card_use` MODIFY COLUMN `integral`  int(11) NOT NULL DEFAULT 0 COMMENT '段位积分' AFTER `card_model_id`;
+
+ALTER TABLE `log_qualifying_battle` ADD COLUMN `win_rate`  float NULL DEFAULT NULL COMMENT '胜率' AFTER `channel`;
+
+ALTER TABLE `log_qualifying_battle` ADD COLUMN `sword`  int(11) NULL DEFAULT NULL COMMENT '排位战力' AFTER `win_rate`;
+
+ALTER TABLE `log_tower_battle` ADD COLUMN `bonus`  int(11) NULL DEFAULT 0 COMMENT '额外战斗' AFTER `result`;
+
+ALTER TABLE `log_tower_battle` DROP COLUMN `lineup_rule`;
+
+ALTER TABLE `log_tower_battle` DROP COLUMN `energy_used`;
+
+ALTER TABLE `log_tower_battle` DROP COLUMN `pre_energy`;
+
+ALTER TABLE `log_tower_battle` DROP COLUMN `post_energy`;
+
+ALTER TABLE `log_tower_battle` DROP COLUMN `reward_energy`;
+
+ALTER TABLE `log_tower_battle` DROP COLUMN `reward_scrap`;
+
+ALTER TABLE `log_tower_battle` DROP COLUMN `reward_rune`;
+
+CREATE TABLE `log_tower_level` (
+`log_id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID' ,
+`player_id`  bigint(20) NOT NULL DEFAULT 0 COMMENT '玩家id' ,
+`player_name`  varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '玩家名称' ,
+`create_time`  bigint(20) NOT NULL DEFAULT 0 COMMENT '角色创建时间' ,
+`level`  int(11) NOT NULL DEFAULT 0 COMMENT '等级' ,
+`vip_level`  tinyint(4) NOT NULL DEFAULT 0 COMMENT 'VIP 等级' ,
+`event`  int(11) NOT NULL DEFAULT 0 COMMENT '事件类型' ,
+`event_time`  bigint(20) NOT NULL DEFAULT 0 COMMENT '事件时间' ,
+`sdk_id`  int(11) NULL DEFAULT 0 COMMENT 'sdkId' ,
+`channel`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '渠道' ,
+`tower_level`  int(11) NULL DEFAULT 0 COMMENT '地宫层数' ,
+`tower_level_type`  int(11) NULL DEFAULT 0 COMMENT '地宫层信息' ,
+`energy_left`  int(11) NULL DEFAULT 0 COMMENT '剩余能量' ,
+`star`  int(11) NULL DEFAULT 0 COMMENT '星星' ,
+`score_boost`  float NULL DEFAULT 0 COMMENT '双倍积分' ,
+PRIMARY KEY (`log_id`),
+INDEX `player_id` (`player_id`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+ROW_FORMAT=Compact
+;
+
+CREATE TABLE `log_tower_output_consume` (
+`log_id`  bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID' ,
+`player_id`  bigint(20) NOT NULL DEFAULT 0 COMMENT '玩家id' ,
+`player_name`  varchar(40) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '玩家名称' ,
+`create_time`  bigint(20) NOT NULL DEFAULT 0 COMMENT '角色创建时间' ,
+`level`  int(11) NOT NULL DEFAULT 0 COMMENT '等级' ,
+`vip_level`  tinyint(4) NOT NULL DEFAULT 0 COMMENT 'VIP 等级' ,
+`event`  int(11) NOT NULL DEFAULT 0 COMMENT '事件类型' ,
+`event_time`  bigint(20) NOT NULL DEFAULT 0 COMMENT '事件时间' ,
+`sdk_id`  int(11) NULL DEFAULT 0 COMMENT 'sdkId' ,
+`channel`  varchar(100) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '' COMMENT '渠道' ,
+`delta`  int(11) NULL DEFAULT 0 COMMENT '变化值' ,
+`pre_value`  int(11) NULL DEFAULT 0 COMMENT '变化之前值' ,
+`post_value`  int(11) NULL DEFAULT 0 COMMENT '变化之后值' ,
+`module_id`  int(11) NULL DEFAULT 0 COMMENT '模块ID' ,
+`source_type`  int(11) NULL DEFAULT 0 COMMENT '来源类型' ,
+PRIMARY KEY (`log_id`),
+INDEX `player_id` (`player_id`) USING BTREE 
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+ROW_FORMAT=Compact
+;
+
+CREATE TABLE `player_card_enhance` (
+`player_id`  bigint(20) NOT NULL ,
+`card_enhance_map`  text CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '卡牌强化集合' ,
+PRIMARY KEY (`player_id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARACTER SET=utf8 COLLATE=utf8_general_ci
+ROW_FORMAT=Compact
+;
+
+ALTER TABLE `player_daily_online` ADD COLUMN `func_start_time`  bigint(20) NULL DEFAULT 0 AFTER `receive_map`;
+
+DROP TABLE `log_tower_exchange`;
+
+DROP TABLE `log_tower_reward`;
+
+SET FOREIGN_KEY_CHECKS=1;
+

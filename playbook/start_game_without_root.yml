@@ -1,0 +1,29 @@
+---
+# - include: sync_date.yml
+
+- name: game server start
+  hosts: game_server
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: check_port_stop
+    server_config: "{{gs_config}}"
+  - 
+    role: init_directory
+    server_config: "{{gs_config}}"
+  - 
+    role: copy_and_extract
+    server_config: "{{gs_config}}"
+  - 
+    role: template_game_config
+    server_config: "{{gs_config}}"
+  - 
+    role: start_server
+    server_config: "{{gs_config}}"
+  - 
+    role: wait_port
+    server_config: "{{gs_config}}"
+
+- include: cron_mysql_backup.yml
+

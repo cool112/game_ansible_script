@@ -1,0 +1,115 @@
+#!/bin/bash
+##########################################################
+# Write date  : 2015/11/05
+# Written by  : darren.ouyang <ouyang.darren@gmail.com>
+# Written fea : Game control of shell script
+##########################################################
+. ~/.bash_profile
+
+config_monitor_ip={{inventory_hostname}}
+config_monitor_port={{item.mon_port}}
+
+config_jvm_jar="public_game_server.jar"
+config_jvm_main="{{item.main_class | default('com.darren.game.server.main.GameMain')}}"
+config_jvm_rmi="-Djava.rmi.server.hostname=${config_monitor_ip} -Dcom.sun.management.jmxremote.port=${config_monitor_port}"
+config_jvm_param="{{item.jvm_param}}"
+config_jvm_param_gc="{{item.jvm_param_gc}}"
+config_pid_file="server.pid"
+
+
+
+# 定义显示
+msg_correct=`echo -en "[\033[01;32;40m  OK  \033[0m]"`
+msg_igone=`echo  "[\033[01;32;40m忽略\033[0m]"`
+msg_error=`echo -en "[\033[01;31;40mFAILED\033[0m]"`
+
+
+# 检测服务器是否运行中, 运行中返回1, 否则返回0
+check_server_run()
+{
+	if [ ! -f "$config_pid_file" ]; then
+		return 0
+	fi
+	
+	server_pid=`cat $config_pid_file`
+	if [ -n "$server_pid" ] && [ -d "/proc/$server_pid" ] ; then
+		return 1
+	else
+		return 0
+	fi
+}
+
+#定义打印样式
+style()
+{
+    sleep 1
+    printf "%-51s   %s\n" "$1" "$2"
+}
+
+
+# 进入路径 准备开始
+real_path=$(cd `dirname $0`; pwd)
+echo  "本脚本所在目录路径是: $real_path "
+echo 系统时间 `date +%F\ %T`
+cd $real_path
+
+
+# 检测是否已经开启服务器
+check_server_run
+server_run_state=$?
+if [ $server_run_state -eq 1 ]; then
+	echo -e "\e[31m  目录 $real_path 已有一个进程在运行了! \e[0m"
+	echo -en "是否需要关闭？[y/n]"
+	read answer
+	if [ $answer == y ]; then
+		/bin/sh $real_path/stop.sh
+	else
+		exit 0
+	fi
+fi
+
+
+echo "正在启动游戏..."
+nohup_=`which nohup`
+java_=`which java`
+jps_=`which jps`
+tag=$(pwd |cut -d/ -f5) #脚本所在的目录名称
+chmod 777 ../$tag #给目录写入权限
+
+
+#执行JAVA程序 内网测试
+`$sudo` ${nohup_} ${java_} ${config_jvm_rmi} -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false ${config_jvm_param} ${config_jvm_param_gc} -XX:ErrorFile=${real_path}/log/java_error_%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${real_path}/log/java_oom_%p.prof -cp ./${config_jvm_jar}:./lib/* ${config_jvm_main} >/dev/null &
+echo $! > $config_pid_file
+sleep 4
+
+
+#echo "已经发送启动命令给游戏..."
+#########################################################################################################################
+#检查结果
+
+check_server_run
+server_run_state=$?
+if [ $server_run_state -eq 1 ]; then
+	style "Starting game..." "$msg_correct"
+	sleep 8
+        echo ----------------------------
+	echo "游戏PID是$game_pid"
+	$jps_
+	echo ----------------------------
+	echo
+else	
+	style "Starting game..." "$msg_error"
+	$jps_
+	echo "请手动检查."
+	exit 0
+fi
+
+
+#执行JAVA程序 -- 外网游戏服正式备份
+#`$sudo` ${nohup_} ${java_} -Djava.rmi.server.hostname=112.74.82.93 -Dcom.sun.management.jmxremote.port=9001 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Xmx4096m -Xms4096m -Xss1m -XX:NewSize=2560m -XX:MaxNewSize=2560m -XX:ErrorFile=/var/game/log/java_error_%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/game/log/java_oom_%p.prof -XX:+UseConcMarkSweepGC -XX:MaxGCPauseMillis=30 -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSCompactAtFullCollection -cp ./$config_jar_name:./lib/* com.darren.game.server.main.GameMain >/dev/null &
+
+#执行JAVA程序 -- 外网中心服正式备份
+#`$sudo` ${nohup_} ${java_} -Djava.rmi.server.hostname=112.74.82.93 -Dcom.sun.management.jmxremote.port=9003 -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false -XX:ErrorFile=/var/game/log/center_error_%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/game/log/center_oom_%p.prof -Xmx2048m -Xms2048m -Xss1m -XX:NewSize=192m -XX:MaxNewSize=700m -XX:+UseConcMarkSweepGC -XX:MaxGCPauseMillis=30 -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSCompactAtFullCollection -cp ./$config_jar_name:./lib/* com.rd.cs.CenterServer >/dev/null &
+
+#执行JAVA程序 -- 外网战斗服正式备份
+#`$sudo` ${nohup_} ${java_} -Djava.rmi.server.hostname=112.74.82.93 -Dcom.sun.management.jmxremote.port=9002 -Dcom.sun.management.jmxremote.authenticate=false  -Dcom.sun.management.jmxremote.ssl=false -XX:ErrorFile=/var/game/log/war_error_%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/var/game/log/war_oom_%p.prof -Xmx4096m -Xms4096m -Xss1m -XX:NewSize=2560m -XX:MaxNewSize=2560m -XX:+UseConcMarkSweepGC -XX:MaxGCPauseMillis=30 -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSCompactAtFullCollection -cp ./$config_jar_name:./lib/* com.rd.war.WarServer >/dev/null &

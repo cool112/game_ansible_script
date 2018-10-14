@@ -1,0 +1,32 @@
+- name: create install dir if not exsits
+  shell: mkdir -p {{item.path}}
+  args:
+    creates: "{{item.path}}"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: create package dir if not exsits
+  shell: mkdir -p {{item.package_path}}
+  args:
+    creates: "{{item.package_path}}"
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+
+- name: backup log file
+  shell: mv {{item.path}}/log {{item.package_path}}/{{item.port}}-$(date +%y%m%d%H)-log
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"
+  ignore_errors: True
+  
+- name: clean old install dir
+  shell: rm -fr {{item.path}}/*
+  with_items: "{{server_config | default([])}}"
+  when: 
+    - "allow_ports is undefined or {{[item.port]}} | issubset(allow_ports)"
+    - "allow_gc_ids is undefined or {{[item.gc_id]}} | issubset(allow_gc_ids)"

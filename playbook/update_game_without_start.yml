@@ -1,0 +1,26 @@
+---
+- name: game server update without start
+  hosts: game_server
+  remote_user: "{{remote_user}}"
+
+  roles:
+  - 
+    role: check_port_use_and_kill
+    server_config: "{{gs_config}}"
+  - 
+    role: check_mysql
+    server_config: "{{gs_config}}"
+  - 
+    role: init_directory
+    server_config: "{{gs_config}}"
+  - 
+    role: copy_and_extract
+    server_config: "{{gs_config}}"
+  - 
+    role: template_game_config
+    server_config: "{{gs_config}}"
+  # - 
+    # role: execute_update_game_sql
+    # server_config: "{{gs_config}}"
+
+- include: cron_mysql_backup.yml

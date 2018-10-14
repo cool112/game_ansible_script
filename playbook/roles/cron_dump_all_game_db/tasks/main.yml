@@ -1,0 +1,43 @@
+- name: init backup dir
+  file:
+    path: "{{backup_dir}}"
+    state: directory
+    mode: 0755
+
+- name: template multiBackupMysql.sh file
+  template: 
+    src: multiBackupMysql.sh.j2
+    dest: "{{backup_dir}}/multiBackupMysql{{backup_suffix | default()}}.sh"
+
+- name: collect all game hosts in game_server
+  debug:
+    msg: "{{hostvars[item].gs_config}}"
+  with_items: "{{groups['game_server']}}"
+  register: game_info
+  
+- name: add dump and gz statement in multiBackupMysql.sh
+  lineinfile:
+    dest: "{{backup_dir}}/multiBackupMysql{{backup_suffix | default()}}.sh"
+    regexp: "^#add new dump statement#$"
+    state: present
+    line: |
+      mysqldump -u{{item[1].db_user}} -h{{item[1].db_host | regex_replace('localhost',item[0].item)}} -p{{item[1].db_pwd}} {{item[1].db_name_pre}} > {{backup_dir}}/{{item[1].db_name_pre}}_$(date +%Y%m%d).dump
+      gzip {{backup_dir}}/{{item[1].db_name_pre}}_$(date +%Y%m%d).dump
+      
+      #add new dump statement#
+  with_subelements:
+    - "{{game_info.results}}"
+    - msg
+  
+- name: mode 755 multiBackupMysql.sh file
+  file:
+    path: "{{backup_dir}}/multiBackupMysql{{backup_suffix | default()}}.sh"
+    state: file
+    mode: 0755
+  
+- name: cron daily backupMysql
+  cron:
+    name: "multiple_db_backup {{backup_dir}}"
+    minute: 0
+    hour: "{{backup_hour}}"
+    job: "{{backup_dir}}/multiBackupMysql{{backup_suffix | default()}}.sh"

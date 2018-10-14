@@ -1,0 +1,22 @@
+---
+- name: update data config
+  hosts: 
+    - game_server
+    - war_server
+  
+  roles:
+    - 
+      role: stop_server
+      server_config: "{{gs_config | union(bs_config)}}"
+    - 
+      role: check_port_stop
+      server_config: "{{gs_config | union(bs_config)}}"
+    - 
+      role: update_static_data
+      server_config: "{{gs_config | union(bs_config)}}"
+    - 
+      role: start_server
+      server_config: "{{gs_config | union(bs_config)}}"
+    - 
+      role: wait_port
+      server_config: "{{gs_config | union(bs_config)}}"

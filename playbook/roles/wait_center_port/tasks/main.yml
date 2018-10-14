@@ -1,0 +1,13 @@
+- name: wait for c_b port
+  wait_for:
+    port: "{{item.bs_port}}"
+    timeout: 30
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.gs_port,item.bs_port]}} | issubset(allow_ports)"
+
+- name: wait for c_g port
+  wait_for:
+    port: "{{item.gs_port}}"
+    timeout: 30
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.gs_port,item.bs_port]}} | issubset(allow_ports)"

@@ -1,0 +1,15 @@
+---
+# 合服注意事项：
+# 1、检查player相关表是否与代码版本一致
+# 2、merge.sql是否是最新版本
+# 3、master_gc_id\slave_gc_id等配置信息
+- name: merge master game server db
+  hosts: game_server
+  
+  roles:
+  - 
+    role: backup_mysql_data_only
+    allow_gc_ids: "{{master_gc_id}}"
+  - 
+    role: import_data_to_master_db
+    master_host: "{{master_host}}"

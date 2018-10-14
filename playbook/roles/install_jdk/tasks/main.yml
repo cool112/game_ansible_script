@@ -1,0 +1,19 @@
+- name: check if exsits proper jdk
+  shell: find /usr/java -name 'jdk1.8.0*' -type d|head -n1
+  register: possible_jdk
+  ignore_errors: True
+
+- name: copy jdk.rpm to remote package directory
+  copy: 
+    src: "{{jdk_src}}/{{jdk_version}}"
+    dest: "{{jdk_package_dir}}/"
+    mode: "0755"
+  when: possible_jdk.stdout == ""
+  become: true
+
+- name: install jdk
+  shell: rpm -i {{jdk_version}}
+  args:
+    chdir: "{{jdk_package_dir}}"
+  when: possible_jdk.stdout == ""
+  become: true

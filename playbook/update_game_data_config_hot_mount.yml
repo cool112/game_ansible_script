@@ -1,0 +1,9 @@
+---
+- name: update game data config
+  hosts: 
+    - game_server
+  
+  roles:
+    - 
+      role: update_static_data
+      server_config: "{{gs_config | default([])}}"

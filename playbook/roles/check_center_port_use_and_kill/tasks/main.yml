@@ -1,0 +1,19 @@
+- name: check if center is running
+  shell: ps ax|grep {{item.path}}/|grep -v grep|awk '{print $1}'
+  with_items: "{{server_config | default([])}}"
+  ignore_errors: True
+  register: psResult
+  when: "allow_ports is undefined or {{[item.gs_port,item.bs_port]}} | issubset(allow_ports)"
+
+- name: kill running process
+  shell: kill -15 {{item.stdout}}
+  when: item|changed and item.stdout != ""
+  with_items: "{{psResult.results | default([])}}"
+  
+- name: wait center server stop if not
+  wait_for:
+    port: "{{item.gs_port}}"
+    timeout: 30
+    state: stopped
+  with_items: "{{server_config | default([])}}"
+  when: "allow_ports is undefined or {{[item.gs_port,item.bs_port]}} | issubset(allow_ports)"
